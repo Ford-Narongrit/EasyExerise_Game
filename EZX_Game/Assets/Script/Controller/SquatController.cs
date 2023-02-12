@@ -24,7 +24,7 @@ public class SquatController : MonoBehaviour
     //Timer
     [Header("Timer")]
     public TMP_Text timerText;
-    public float maxTimer_seconds = 4f;
+    public float maxTimer_seconds = 120f;
     private float currentTimer;
 
     private void Start()
