@@ -8,7 +8,7 @@ public class SquatController : MonoBehaviour
     [Header("Charger")]
     public GaugeBar chargerBar;
     private float currentCharge = 0;
-    public float maxCharge = 3;
+    public float maxCharge = 2;
 
     // counter
     [Header("Counter")]
@@ -21,10 +21,17 @@ public class SquatController : MonoBehaviour
     public int maxCombo;
     private int currentCombo;
 
+    //Timer
+    [Header("Timer")]
+    public TMP_Text timerText;
+    public float maxTimer_seconds = 4f;
+    private float currentTimer;
+
     private void Start()
     {
         chargerBar.SetStartValue(maxCharge);
         counterBar.SetStartCounterValue(maxCombo);
+        currentTimer = maxTimer_seconds;
     }
 
     private void Update()
@@ -37,6 +44,8 @@ public class SquatController : MonoBehaviour
         {
             Release();
         }
+
+        CountDownTimer();
     }
 
     private void Charge()
@@ -70,5 +79,21 @@ public class SquatController : MonoBehaviour
     {
         count += 1;
         counterText.text = count + "";
+    }
+
+    private void CountDownTimer()
+    {
+        if (currentTimer > 0 )
+        {
+            currentTimer -= Time.deltaTime;
+        }
+        else
+        {
+            currentTimer = 0;
+        }
+
+        float minutes = Mathf.FloorToInt(currentTimer / 60);
+        float seconds = Mathf.FloorToInt(currentTimer % 60);
+        timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
     }
 }

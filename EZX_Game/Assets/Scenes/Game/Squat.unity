@@ -1306,10 +1306,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   chargerBar: {fileID: 1857548966}
-  maxCharge: 3
+  maxCharge: 1.5
   counterText: {fileID: 1669056381}
   counterBar: {fileID: 1577143145}
   maxCombo: 10
+  timerText: {fileID: 1132130920}
+  maxTimer_seconds: 150
 --- !u!4 &1651295742
 Transform:
   m_ObjectHideFlags: 0
