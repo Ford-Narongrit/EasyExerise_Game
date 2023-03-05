@@ -1,9 +1,13 @@
 using System.Collections;
+using System.Linq;
 using System.Net;
+using System.Net.NetworkInformation;
 using Unity.Networking.Transport;
 using UnityEngine;
-using TMPro;
-using System;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+using ZXing;
+using ZXing.QrCode;
 
 public class ConnectSceneManager : MonoBehaviour
 {
@@ -12,17 +16,24 @@ public class ConnectSceneManager : MonoBehaviour
     private ushort port = 8007;
 
     // UI
-    [SerializeField] TMP_Text IPAddressText;
+    [SerializeField] RawImage QRimage;
+    private Texture2D storeEncodedTexture;
 
     private void Start()
     {
-        IPAddressText.text = getIp() + ":" + port;
+        // Generate QRcode
+        storeEncodedTexture = new Texture2D(256, 256);
+        EncodeTextToQRcode(getNetworkIp());
         server.Init(port);
 
         RegisterEvents();
     }
+    public void OnclickRefresh()
+    {
+        EncodeTextToQRcode(getNetworkIp());
+    }
 
-    private string getIp()
+    private string getLocalIp()
     {
         IPHostEntry host;
         string localIP = "?";
@@ -39,7 +50,58 @@ public class ConnectSceneManager : MonoBehaviour
         return localIP;
     }
 
-    #region 
+    private string getNetworkIp()
+    {
+        NetworkInterface[] interfaces = NetworkInterface.GetAllNetworkInterfaces();
+        NetworkInterface wirelessInterface = interfaces.FirstOrDefault(i => i.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 && i.OperationalStatus == OperationalStatus.Up);
+
+        if (wirelessInterface != null)
+        {
+            // Get the IPv4 address of the wireless interface
+            IPInterfaceProperties properties = wirelessInterface.GetIPProperties();
+            IPAddress ipAddress = properties.UnicastAddresses.FirstOrDefault(a => a.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)?.Address;
+
+            if (ipAddress != null)
+            {
+                // Do something with the IPv4 address
+                Debug.Log("Wireless IPv4 address: " + ipAddress.ToString());
+                return ipAddress.ToString();
+            }
+            else
+            {
+                Debug.Log("Could not find wireless IPv4 address.");
+            }
+        }
+        else
+        {
+            Debug.Log("Wireless interface not found.");
+        }
+        return null;
+    }
+
+    private void EncodeTextToQRcode(string text)
+    {
+        Color32[] _convertPixelTotexture = Encode(text, storeEncodedTexture.width, storeEncodedTexture.height);
+        storeEncodedTexture.SetPixels32(_convertPixelTotexture);
+        storeEncodedTexture.Apply();
+
+        QRimage.texture = storeEncodedTexture;
+    }
+    private Color32[] Encode(string textForEncoding, int width, int height)
+    {
+        BarcodeWriter writer = new BarcodeWriter
+        {
+            Format = BarcodeFormat.QR_CODE,
+            Options = new QrCodeEncodingOptions
+            {
+                Height = height,
+                Width = width
+            }
+        };
+        return writer.Write(textForEncoding);
+    }
+
+    #region Server
     private void RegisterEvents()
     {
         NetUtility.S_WELCOME += OnWelcomeServer;
@@ -62,6 +124,8 @@ public class ConnectSceneManager : MonoBehaviour
         Debug.Log("new connector : " + cnn.InternalId);
         NetWelcome netWelcome = msg as NetWelcome;
         Server.Instance.SendToClient(cnn, netWelcome);
+
+        SceneManager.LoadScene("StartMenu");
     }
     #endregion
 }

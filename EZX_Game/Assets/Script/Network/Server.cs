@@ -9,7 +9,11 @@ public class Server : MonoBehaviour
     public static Server Instance { set; get; }
     private void Awake()
     {
-        Instance = this;
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(this.gameObject);
+        }
     }
     #endregion
 
@@ -73,7 +77,7 @@ public class Server : MonoBehaviour
     }
     private void KeepAlive()
     {
-        if(Time.time - lastKeepAlive > keepAliveTickRate)
+        if (Time.time - lastKeepAlive > keepAliveTickRate)
         {
             lastKeepAlive = Time.time;
             Broadcast(new NetKeepAlive());
