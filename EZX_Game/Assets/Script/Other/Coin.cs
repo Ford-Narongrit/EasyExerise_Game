@@ -8,6 +8,7 @@ public class Coin : MonoBehaviour, Interactable, Moveable, Damageable
     public float destroyTime = 5f;
     public float point = 1;
     private GameObject coin;
+    public float speed = 100f;
 
     private void Awake()
     {
@@ -17,6 +18,7 @@ public class Coin : MonoBehaviour, Interactable, Moveable, Damageable
     private void Update()
     {
         Moveforward();
+        transform.Rotate(0f, speed*Time.deltaTime, 0f);
     }
     public void Interact()
     {

@@ -9,11 +9,14 @@ public class PlayerRunController : MonoBehaviour
     public float point = 0;
     public float MaxSpeed = 4f;
     public float MinSpeed = -4f;
+    private AudioSource audioSource;
+    public AudioClip itemSound;
 
     private float currentMovementSpeed = 1f;
     private void Awake()
     {
         playerAnimator = player.GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void Update()
@@ -53,6 +56,7 @@ public class PlayerRunController : MonoBehaviour
             Damageable damageObject = other.gameObject.GetComponent<Damageable>();
             point = point - damageObject.damage();
             Destroy(other.gameObject);
+            audioSource.PlayOneShot(itemSound);
             if (point <= 0) point = 0;
         }
         catch (System.Exception e)
